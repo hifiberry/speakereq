@@ -6,7 +6,8 @@ Build-Depends: debhelper-compat (= 13),
                gcc,
                make,
                ladspa-sdk,
-               python3
+               python3,
+               graphviz
 Standards-Version: 4.6.0
 Homepage: https://github.com/hifiberry/speakereq
 Vcs-Git: https://github.com/hifiberry/speakereq.git
