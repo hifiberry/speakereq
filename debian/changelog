@@ -1,0 +1,96 @@
+ladspa-speakereq (1.2-1) stable; urgency=medium
+
+  * Removed the date-based license check; the plugin no longer stops
+    equalizing after a fixed expiry date. The "Licensed" output port is
+    retained for API compatibility and now always reports 1.
+  * Corrected packaging metadata: MIT license (matching LICENSE), HiFiBerry
+    as maintainer, and the real upstream repository URLs
+  * Documented the vendored inih (utils/ini.c) as BSD-3-Clause
+  * Removed stale LV2 references left over from the LADSPA-only refactoring
+  * Corrected the documented port layout to the actual 418 ports
+  * Fixed invalid LADSPA port hints on the "Enable" and "save_settings"
+    ports, which combined LADSPA_HINT_TOGGLED with hints the specification
+    does not permit alongside it. The advertised default of "Enable" now
+    reads as 1 (process) instead of 0, and so agrees with the value hosts
+    were already using. This corrects the advertised metadata only; the
+    PipeWire filter chain resolved "Enable" to 1 with the previous hints
+    as well, so processing behaviour is unchanged.
+
+ -- HiFiBerry <info@hifiberry.com>  Thu, 13 Aug 2026 12:00:00 +0200
+
+ladspa-speakereq (1.1-1) stable; urgency=medium
+
+  * Changed configuration file location from ~/.config/ladspa/ to ~/.state/ladspa/
+  * Set priority.driver to 1 (was 2000) in PipeWire configuration
+  * Added node.always-process = true to PipeWire configuration for continuous processing
+
+ -- Speaker EQ Team <contact@example.com>  Sat, 01 Feb 2026 12:00:00 +0100
+
+ladspa-speakereq (1.0.6-1) stable; urgency=medium
+
+  * Removed LV2 plugin, now LADSPA only
+  * Simplified build dependencies
+
+ -- Speaker EQ Team <contact@example.com>  Fri, 31 Jan 2026 14:30:00 +0100
+
+ladspa-speakereq (1.0.5-1) stable; urgency=medium
+
+  * Renamed package to ladspa-speakereq
+  * Removed pw-api (REST API server and tools)
+  * Simplified to LADSPA plugin only
+  * Parameters now controlled via pw-cli instead of pw-param
+  * Removed PipeWire and Rust build dependencies
+
+ -- Speaker EQ Team <contact@example.com>  Fri, 31 Jan 2026 14:00:00 +0100
+
+speakereq (1.0.4-1) stable; urgency=medium
+
+  * Fixed speakereq.so path
+
+ -- Speaker EQ Team <contact@example.com>  Thu, 30 Jan 2026 12:00:00 +0100
+
+speakereq (1.0.3-1) stable; urgency=medium
+
+  * Added PipeWire configuration files to package
+  * Install 90-speakereq.conf to /etc/pipewire/pipewire.conf.d/
+  * Install 99-force-effect-filter.conf to /etc/xdg/wireplumber/wireplumber.conf.d/
+  * Include PipeWire README in documentation
+  * Ready-to-use configuration for automatic audio filtering
+
+ -- Speaker EQ Team <contact@example.com>  Fri, 31 Jan 2026 10:00:00 +0100
+
+speakereq (1.0.2-1) stable; urgency=medium
+
+  * Changed default API server port from 8080 to 2716
+  * API server now binds to all interfaces (0.0.0.0) by default
+  * Added --localhost option to restrict API server to localhost
+  * Added -p/--port option to customize API server port
+  * Renamed API.md to lowercase api.md
+  * api.md now installed uncompressed in documentation
+  * Updated all documentation with new port and options
+
+ -- Speaker EQ Team <contact@example.com>  Thu, 30 Jan 2026 12:00:00 +0100
+
+speakereq (1.0.1-1) stable; urgency=medium
+
+  * Added comprehensive man page documentation
+  * Updated filter-chain.conf with runtime parameter control documentation
+  * All parameters now dynamically adjustable with PipeWire
+  * Added persistent settings functionality
+  * Improved Debian packaging with man page installation
+  * Added architecture diagram to package documentation
+
+ -- Speaker EQ Team <contact@example.com>  Thu, 30 Jan 2026 10:30:00 +0100
+
+speakereq (1.0.0-1) unstable; urgency=medium
+
+  * Initial release
+  * LADSPA and LV2 plugin support
+  * REST API server with systemd integration
+  * Per-band enable/disable functionality
+  * 20-band parametric EQ per channel
+  * PipeWire integration with filter chain
+  * Command-line parameter management tools
+
+ -- Speaker EQ Team <contact@example.com>  Wed, 29 Jan 2026 17:00:00 +0100
+

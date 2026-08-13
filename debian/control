@@ -1,0 +1,29 @@
+Source: ladspa-speakereq
+Section: sound
+Priority: optional
+Maintainer: HiFiBerry <info@hifiberry.com>
+Build-Depends: debhelper-compat (= 13),
+               gcc,
+               make,
+               ladspa-sdk,
+               python3
+Standards-Version: 4.6.0
+Homepage: https://github.com/hifiberry/speakereq
+Vcs-Git: https://github.com/hifiberry/speakereq.git
+Vcs-Browser: https://github.com/hifiberry/speakereq
+
+Package: ladspa-speakereq
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Conflicts: speakereq
+Replaces: speakereq
+Description: Speaker equalization LADSPA plugin
+ A flexible speaker equalization solution for Linux audio.
+ Provides LADSPA plugin for audio processing.
+ .
+ Features:
+  - 2x2 stereo processing with crossbar routing
+  - 20-band parametric EQ per channel (input and output)
+  - Per-band enable/disable functionality
+  - Delay compensation

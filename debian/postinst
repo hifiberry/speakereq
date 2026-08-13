@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        echo "LADSPA SpeakerEQ installed successfully!"
+        echo ""
+        echo "LADSPA plugin: /usr/lib/ladspa/speakereq2x2.so"
+        echo ""
+        echo "To use with PipeWire, restart PipeWire with:"
+        echo "  systemctl --user restart pipewire wireplumber"
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

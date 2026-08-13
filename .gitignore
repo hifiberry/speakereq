@@ -1,0 +1,16 @@
+*.so
+*_response.txt
+*.o
+*_response.png
+test_clickdetect
+test_riaa_clicks
+test_click_energy
+test_lpc
+riaa_process
+test/__pycache__/*
+debian/.debhelper/*
+debian/debhelper-build-stamp
+debian/files
+debian/*.debhelper.log
+debian/*.substvars
+debian/ladspa-speakereq/

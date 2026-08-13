@@ -1,0 +1,201 @@
+digraph SpeakerEQ2x2 {
+    // Graph attributes
+    rankdir=LR;
+    node [shape=box, style=rounded];
+    graph [splines=ortho, nodesep=0.8, ranksep=1.2];
+    
+    // Input nodes
+    {
+        rank=same;
+        input_l [label="Input L", shape=circle, style=filled, fillcolor=lightblue];
+        input_r [label="Input R", shape=circle, style=filled, fillcolor=lightblue];
+    }
+    
+    // Output nodes
+    {
+        rank=same;
+        output_l [label="Output L", shape=circle, style=filled, fillcolor=lightgreen];
+        output_r [label="Output R", shape=circle, style=filled, fillcolor=lightgreen];
+    }
+    
+    // Input filterbanks
+    subgraph cluster_input_filters {
+        label="Input Filterbanks";
+        style=filled;
+        fillcolor=lightyellow;
+        rank=same;
+        
+        input_fb_l [label=<
+            <B>Input Filterbank L</B><BR/>
+            <FONT POINT-SIZE="10">20 bands × 4 params<BR/>
+            Types: NOOP, HP, LP, PEQ,<BR/>
+            NOTCH, LS, HS, HP1, LP1</FONT>
+        >, shape=rectangle];
+        
+        input_fb_r [label=<
+            <B>Input Filterbank R</B><BR/>
+            <FONT POINT-SIZE="10">20 bands × 4 params<BR/>
+            Types: NOOP, HP, LP, PEQ,<BR/>
+            NOTCH, LS, HS, HP1, LP1</FONT>
+        >, shape=rectangle];
+    }
+    
+    // Crossbar mixer
+    subgraph cluster_crossbar {
+        label="Crossbar Mixer";
+        style=filled;
+        fillcolor=lightcoral;
+        rank=same;
+        
+        crossbar_in [label=<
+            <B>Inputs</B><BR/>
+            <FONT POINT-SIZE="10">L<BR/>R</FONT>
+        >, shape=rectangle, width=0.8];
+        
+        crossbar_matrix [label=<
+            <B>2×2 Matrix</B><BR/>
+            <FONT POINT-SIZE="10">Gains 0-2.0<BR/>Default: Identity</FONT>
+        >, shape=rectangle, width=1.2];
+        
+        crossbar_out [label=<
+            <B>Outputs</B><BR/>
+            <FONT POINT-SIZE="10">L<BR/>R</FONT>
+        >, shape=rectangle, width=0.8];
+        
+        crossbar_in -> crossbar_matrix [style=invis];
+        crossbar_matrix -> crossbar_out [style=invis];
+    }
+    
+    // Output filterbanks
+    subgraph cluster_output_filters {
+        label="Output Filterbanks";
+        style=filled;
+        fillcolor=lightcyan;
+        rank=same;
+        
+        output_fb_l [label=<
+            <B>Output Filterbank L</B><BR/>
+            <FONT POINT-SIZE="10">20 bands × 4 params<BR/>
+            Types: NOOP, HP, LP, PEQ,<BR/>
+            NOTCH, LS, HS, HP1, LP1</FONT>
+        >, shape=rectangle];
+        
+        output_fb_r [label=<
+            <B>Output Filterbank R</B><BR/>
+            <FONT POINT-SIZE="10">20 bands × 4 params<BR/>
+            Types: NOOP, HP, LP, PEQ,<BR/>
+            NOTCH, LS, HS, HP1, LP1</FONT>
+        >, shape=rectangle];
+    }
+    
+    // Output delays
+    subgraph cluster_delays {
+        label="Output Delays";
+        style=filled;
+        fillcolor=lightgoldenrodyellow;
+        rank=same;
+        
+        delay_l [label=<
+            <B>Delay L</B><BR/>
+            <FONT POINT-SIZE="10">0-100 ms<BR/>
+            Default: 0 ms<BR/>
+            Port: delay_0_ms</FONT>
+        >, shape=rectangle];
+        
+        delay_r [label=<
+            <B>Delay R</B><BR/>
+            <FONT POINT-SIZE="10">0-100 ms<BR/>
+            Default: 0 ms<BR/>
+            Port: delay_1_ms</FONT>
+        >, shape=rectangle];
+    }
+    
+    // Input gain controls
+    subgraph cluster_input_gains {
+        label="Input Gains";
+        style=filled;
+        fillcolor=lavender;
+        rank=same;
+        
+        input_gain [label=<
+            <B>Input Gains</B><BR/>
+            <FONT POINT-SIZE="10">-100 to +24 dB<BR/>
+            Default: 0 dB<BR/>
+            L &amp; R channels</FONT>
+        >, shape=rectangle];
+    }
+    
+    // Output gain controls
+    subgraph cluster_output_gains {
+        label="Output Gains";
+        style=filled;
+        fillcolor=lightsteelblue;
+        rank=same;
+        
+        output_gain [label=<
+            <B>Output Gains</B><BR/>
+            <FONT POINT-SIZE="10">-100 to +24 dB<BR/>
+            Default: 0 dB<BR/>
+            L &amp; R channels</FONT>
+        >, shape=rectangle];
+    }
+    
+    // Master gain control
+    subgraph cluster_master_gain {
+        label="Master Gain";
+        style=filled;
+        fillcolor=plum;
+        rank=same;
+        
+        master_gain [label=<
+            <B>Master Gain</B><BR/>
+            <FONT POINT-SIZE="10">-100 to +24 dB<BR/>
+            Default: 0 dB<BR/>
+            Both channels</FONT>
+        >, shape=rectangle];
+    }
+    
+    // Signal flow connections
+    input_l -> input_gain [xlabel="  Audio L  ", fontsize=10];
+    input_r -> input_gain [xlabel="  Audio R  ", fontsize=10];
+    
+    input_gain -> input_fb_l [xlabel="  Gained L  ", fontsize=10];
+    input_gain -> input_fb_r [xlabel="  Gained R  ", fontsize=10];
+    
+    input_fb_l -> crossbar_in [xlabel="  Filtered L  ", fontsize=10];
+    input_fb_r -> crossbar_in [xlabel="  Filtered R  ", fontsize=10];
+    
+    crossbar_out -> output_fb_l [xlabel="  Mixed L  ", fontsize=10];
+    crossbar_out -> output_fb_r [xlabel="  Mixed R  ", fontsize=10];
+    
+    output_fb_l -> delay_l [xlabel="  Filtered  ", fontsize=10];
+    output_fb_r -> delay_r [xlabel="  Filtered  ", fontsize=10];
+    
+    delay_l -> output_gain [xlabel="  Delayed L  ", fontsize=10];
+    delay_r -> output_gain [xlabel="  Delayed R  ", fontsize=10];
+    
+    output_gain -> master_gain [xlabel="  Gained  ", fontsize=10];
+    
+    master_gain -> output_l [xlabel="  Final L  ", fontsize=10];
+    master_gain -> output_r [xlabel="  Final R  ", fontsize=10];
+    
+    // Legend
+    subgraph cluster_legend {
+        label="Port Structure (335 total)";
+        style=filled;
+        fillcolor=white;
+        
+        legend [label=<
+            <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+            <TR><TD COLSPAN="2"><B>Port Allocation</B></TD></TR>
+            <TR><TD ALIGN="LEFT">Ports 0-3</TD><TD ALIGN="LEFT">Audio I/O (4)</TD></TR>
+            <TR><TD ALIGN="LEFT">Ports 4-163</TD><TD ALIGN="LEFT">Input EQ (160)</TD></TR>
+            <TR><TD ALIGN="LEFT">Ports 164-167</TD><TD ALIGN="LEFT">Crossbar (4)</TD></TR>
+            <TR><TD ALIGN="LEFT">Ports 168-327</TD><TD ALIGN="LEFT">Output EQ (160)</TD></TR>
+            <TR><TD ALIGN="LEFT">Ports 328-329</TD><TD ALIGN="LEFT">Delays (2)</TD></TR>
+            <TR><TD ALIGN="LEFT">Ports 330-333</TD><TD ALIGN="LEFT">Gains (4: Input L/R, Output L/R)</TD></TR>
+            <TR><TD ALIGN="LEFT">Port 334</TD><TD ALIGN="LEFT">Master Gain (1)</TD></TR>
+            </TABLE>
+        >, shape=none];
+    }
+}

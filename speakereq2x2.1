@@ -1,0 +1,186 @@
+.TH SPEAKEREQ2X2 1 "January 2026" "SpeakerEQ 1.0.0" "User Commands"
+.SH NAME
+speakereq2x2 \- 2x2 stereo speaker equalization LADSPA plugin for PipeWire
+.SH SYNOPSIS
+Loaded via PipeWire filter-chain configuration
+.br
+Controlled with: \fBpw-cli\fR set-param [node-id] Props '{...}'
+.SH DESCRIPTION
+\fBspeakereq2x2\fR is a flexible stereo speaker equalization plugin that provides:
+.IP \(bu 2
+2x2 stereo processing with crossbar routing
+.IP \(bu 2
+40 bands total: 20-band parametric EQ per channel (input and output)
+.IP \(bu 2
+Per-band enable/disable functionality
+.IP \(bu 2
+Independent delay compensation per channel
+.IP \(bu 2
+Comprehensive gain controls (input, output, and master)
+.PP
+The plugin is loaded by PipeWire as a filter-chain and integrates seamlessly with the audio pipeline. All parameters can be controlled dynamically at runtime without restarting audio services.
+.SH PARAMETERS
+.SS Global Controls
+.TP
+.B Enable
+Plugin enable/disable switch (0=disabled, 1=enabled). Default: 1
+.SS Input Equalizer (20 bands per channel)
+.TP
+.B input_<channel>_eq_<band>_type
+Filter type. Range: 0-6. Default: 0 (NOOP)
+.RS
+.IP 0 4
+NOOP - Filter disabled (passthrough)
+.IP 1 4
+PK - Peaking filter
+.IP 2 4
+LP - Lowpass filter
+.IP 3 4
+HP - Highpass filter
+.IP 4 4
+LS - Low shelf filter
+.IP 5 4
+HS - High shelf filter
+.IP 6 4
+NO - Notch filter
+.RE
+.TP
+.B input_<channel>_eq_<band>_f
+Center/corner frequency in Hz. Range: 20-20000. Default: 1000
+.TP
+.B input_<channel>_eq_<band>_q
+Filter Q factor (bandwidth). Range: 0.1-10.0. Default: 0.707
+.TP
+.B input_<channel>_eq_<band>_gain
+Filter gain in dB. Range: -24 to +24. Default: 0
+.TP
+.B input_<channel>_eq_<band>_enabled
+Band enable switch (0=disabled, 1=enabled). Default: 1
+.SS Crossbar Mixer
+.TP
+.B xbar_<in>_to_<out>
+Crossbar routing coefficients. Range: 0.0-1.0. Default: Identity matrix
+.br
+xbar_0_to_0 = 1.0 (Left input to left output)
+.br
+xbar_0_to_1 = 0.0 (Left input to right output)
+.br
+xbar_1_to_0 = 0.0 (Right input to left output)
+.br
+xbar_1_to_1 = 1.0 (Right input to right output)
+.SS Output Equalizer (20 bands per channel)
+.TP
+.B output_<channel>_eq_<band>_type
+Filter type. Same values as input EQ.
+.TP
+.B output_<channel>_eq_<band>_f
+Center/corner frequency in Hz. Range: 20-20000. Default: 1000
+.TP
+.B output_<channel>_eq_<band>_q
+Filter Q factor. Range: 0.1-10.0. Default: 0.707
+.TP
+.B output_<channel>_eq_<band>_gain
+Filter gain in dB. Range: -24 to +24. Default: 0
+.TP
+.B output_<channel>_eq_<band>_enabled
+Band enable switch (0=disabled, 1=enabled). Default: 1
+.SS Delay Compensation
+.TP
+.B delay_<channel>_ms
+Per-channel delay in milliseconds. Range: 0-100. Default: 0
+.SS Gain Controls
+.TP
+.B input_gain_<channel>_db
+Input gain per channel in dB. Range: -100 to +24. Default: 0
+.TP
+.B output_gain_<channel>_db
+Output gain per channel in dB. Range: -100 to +24. Default: 0
+.TP
+.B master_gain_db
+Master gain applied to all channels. Range: -100 to +24. Default: 0
+.SH PARAMETER CONTROL
+All parameters can be controlled dynamically using the \fBpw-cli\fR command:
+.SS Find the node ID
+.nf
+NODE_ID=$(pw-cli list-objects | grep -B 10 "Speaker EQ 2x2" | grep "id:" | head -1 | awk '{print $2}' | tr -d ',')
+.fi
+.SS View current parameters
+.nf
+pw-cli enum-params $NODE_ID Props
+.fi
+.SS Set a parameter value
+.nf
+pw-cli set-param $NODE_ID Props '{ "parameter_name": value }'
+.fi
+.SS Set multiple parameters at once
+.nf
+pw-cli set-param $NODE_ID Props '{
+    "parameter1": value1,
+    "parameter2": value2
+}'
+.fi
+.SH EXAMPLES
+.SS Find the node and view parameters
+.nf
+NODE_ID=$(pw-cli list-objects | grep -B 10 "Speaker EQ 2x2" | grep "id:" | head -1 | awk '{print $2}' | tr -d ',')
+pw-cli enum-params $NODE_ID Props
+.fi
+.SS Add a 3dB boost at 80Hz on left output channel, band 1
+.nf
+pw-cli set-param $NODE_ID Props '{ "output_0_eq_1_type": 1 }'
+pw-cli set-param $NODE_ID Props '{ "output_0_eq_1_f": 80.0 }'
+pw-cli set-param $NODE_ID Props '{ "output_0_eq_1_q": 1.0 }'
+pw-cli set-param $NODE_ID Props '{ "output_0_eq_1_gain": 3.0 }'
+.fi
+.SS Add a highpass filter at 30Hz on both input channels
+.nf
+pw-cli set-param $NODE_ID Props '{ "input_0_eq_1_type": 3 }'
+pw-cli set-param $NODE_ID Props '{ "input_0_eq_1_f": 30.0 }'
+pw-cli set-param $NODE_ID Props '{ "input_0_eq_1_q": 0.707 }'
+pw-cli set-param $NODE_ID Props '{ "input_1_eq_1_type": 3 }'
+pw-cli set-param $NODE_ID Props '{ "input_1_eq_1_f": 30.0 }'
+pw-cli set-param $NODE_ID Props '{ "input_1_eq_1_q": 0.707 }'
+.fi
+.SS Add 5ms delay to left channel for alignment
+.nf
+pw-cli set-param $NODE_ID Props '{ "delay_0_ms": 5.0 }'
+.fi
+.SH FILES
+.TP
+.B /usr/local/lib/ladspa/speakereq2x2.so
+LADSPA plugin library
+.TP
+.B /etc/pipewire/pipewire.conf.d/90-speakereq.conf
+PipeWire filter-chain configuration (system-wide)
+.TP
+.B ~/.config/pipewire/pipewire.conf.d/90-speakereq.conf
+PipeWire filter-chain configuration (user-specific)
+.SH CHANNEL NUMBERING
+Channels are zero-indexed:
+.IP \(bu 2
+Channel 0 = Left
+.IP \(bu 2
+Channel 1 = Right
+.PP
+EQ bands are numbered 1-20 for each channel.
+.SH NOTES
+.IP \(bu 2
+Parameter changes take effect immediately without restarting audio.
+.IP \(bu 2
+The crossbar mixer allows routing flexibility (e.g., swapping channels or creating mono from stereo).
+.SH SEE ALSO
+.BR pw-cli (1),
+.BR pipewire (1),
+.BR pipewire.conf (5)
+.PP
+Full documentation: /usr/share/doc/ladspa-speakereq/
+.SH BUGS
+Report bugs to: https://github.com/hifiberry/speakereq/issues
+.SH AUTHOR
+HiFiBerry
+.SH COPYRIGHT
+Copyright \(co 2026 HiFiBerry
+.br
+Licensed under the MIT License.
+.br
+This is free software: you are free to change and redistribute it.
