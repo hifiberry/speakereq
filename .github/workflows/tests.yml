@@ -1,0 +1,51 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # HiFiBerryOS is Debian trixie, which ships Python 3.13 - that is
+          # the interpreter this plugin's tests actually run under on
+          # device.
+          python-version: '3.13'
+
+      # There is no requirements.txt in this repo, and the test suite itself
+      # imports nothing beyond the standard library (matplotlib is used only
+      # for optional plots and is imported behind a try/except). What it
+      # does need is a compiled speakereq2x2.so on the LADSPA search path
+      # that test-plugin.py hardcodes (/usr/local/lib/ladspa), plus the
+      # tools that drive it: gcc/make to build the plugin, sox with LADSPA
+      # effect support to run audio through it, and ladspa-sdk for
+      # ladspa.h (build time) and analyseplugin (test time, to introspect
+      # the plugin's ports and label).
+      - name: Install build and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential sox ladspa-sdk
+
+      - name: Build the LADSPA plugin
+        run: make ladspa
+
+      - name: Install the plugin
+        run: sudo make install-ladspa
+
+      # test_save_load.py exercises the plugin's parameter-persistence
+      # path, which writes to ~/.state/ladspa/speakereq2x2.ini for a normal
+      # user but to /etc/ladspa/speakereq2x2.ini when running as root
+      # (speakereq2x2_ladspa.c checks getuid() == 0). Run as the runner's
+      # normal, non-root user (the default) so it exercises the same path
+      # a real install does - running this step under sudo/root makes
+      # those two tests fail even though the plugin is working correctly.
+      - name: Run tests
+        run: |
+          cd test
+          python3 test_speakereq2x2.py
