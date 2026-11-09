@@ -84,8 +84,22 @@ uninstall:
 
 # Debian packaging
 deb:
-	@echo "Building Debian package version $(VERSION)..."
-	dpkg-buildpackage -us -uc -b
+	if [ -n "$$DIST" ]; then \
+		echo "Using distribution from DIST environment variable: $$DIST"; \
+		DIST_ARG="--dist=$$DIST"; \
+		CHROOT_ARG="--chroot=$$CHROOT"; \
+	else \
+		echo "No DIST environment variable set, using sbuild default"; \
+		DIST_ARG=""; \
+		CHROOT_ARG=""; \
+	fi; \
+	sbuild \
+		--chroot-mode=unshare \
+		--no-clean-source \
+		--enable-network \
+		$$DIST_ARG \
+		$$CHROOT_ARG \
+		--verbose
 
 deb-clean:
 	@echo "Cleaning Debian build artifacts..."
