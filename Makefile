@@ -71,11 +71,8 @@ install-man: speakereq2x2.1
 
 install-pipewire:
 	mkdir -p /etc/pipewire/pipewire.conf.d
-	mkdir -p /etc/xdg/wireplumber/wireplumber.conf.d
 	cp pipewire/90-speakereq.conf /etc/pipewire/pipewire.conf.d/90-speakereq.conf
-	cp pipewire/99-force-effect-filter.conf /etc/xdg/wireplumber/wireplumber.conf.d/99-force-effect-filter.conf
 	@echo "Installed PipeWire config to /etc/pipewire/pipewire.conf.d/90-speakereq.conf"
-	@echo "Installed WirePlumber config to /etc/xdg/wireplumber/wireplumber.conf.d/99-force-effect-filter.conf"
 	@echo "Restart PipeWire and WirePlumber: systemctl --user restart pipewire wireplumber"
 
 uninstall:
