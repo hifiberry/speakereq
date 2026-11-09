@@ -1,4 +1,3 @@
 architecture.png usr/share/doc/ladspa-speakereq/
 pipewire/90-speakereq.conf etc/pipewire/pipewire.conf.d/
-pipewire/99-force-effect-filter.conf etc/xdg/wireplumber/wireplumber.conf.d/
 pipewire/README.md usr/share/doc/ladspa-speakereq/pipewire/

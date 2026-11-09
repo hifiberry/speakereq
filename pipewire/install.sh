@@ -24,13 +24,14 @@ if [ ! -f "/usr/lib/ladspa/speakereq2x2.so" ] && \
     exit 1
 fi
 
-mkdir -p "$PIPEWIRE_CONF_DIR" "$WIREPLUMBER_CONF_DIR"
+mkdir -p "$PIPEWIRE_CONF_DIR"
 
 cp "$SCRIPT_DIR/90-speakereq.conf" "$PIPEWIRE_CONF_DIR/90-speakereq.conf"
 echo "Installed: $PIPEWIRE_CONF_DIR/90-speakereq.conf"
 
-cp "$SCRIPT_DIR/99-force-effect-filter.conf" "$WIREPLUMBER_CONF_DIR/99-force-effect-filter.conf"
-echo "Installed: $WIREPLUMBER_CONF_DIR/99-force-effect-filter.conf"
+# Earlier versions also installed a WirePlumber rule meant to force every
+# stream into the EQ. It never matched anything; remove it if present.
+rm -f "$WIREPLUMBER_CONF_DIR/99-force-effect-filter.conf"
 
 echo ""
 echo "Installation complete!"
@@ -46,5 +47,4 @@ echo "  \$EDITOR $PIPEWIRE_CONF_DIR/90-speakereq.conf"
 echo ""
 echo "To uninstall:"
 echo "  rm $PIPEWIRE_CONF_DIR/90-speakereq.conf"
-echo "  rm $WIREPLUMBER_CONF_DIR/99-force-effect-filter.conf"
 echo "  systemctl --user restart pipewire wireplumber"

@@ -36,6 +36,23 @@ The filter chain configuration (`90-speakereq.conf`, installed to
 - **Delay Compensation:** 0-100ms delay per output channel
 - **Gain Controls:** Input and output gain adjustment per channel (-24 to +24 dB)
 
+### How audio reaches the EQ
+
+The EQ's input node, `speakereq2x2`, is an `Audio/Sink` with
+`priority.session = 2000`, higher than any hardware sink, so WirePlumber
+makes it the default sink. Every playback stream without an explicit target
+is linked to it, including streams that come and go, such as a Bluetooth
+A2DP source that is recreated on every pause or skip. No WirePlumber rule
+is needed for this.
+
+Earlier versions installed `99-force-effect-filter.conf` into
+`/etc/xdg/wireplumber/wireplumber.conf.d/` for the same purpose. Its rule
+sat under `monitor.alsa.rules`, which applies to ALSA devices, while it
+matched playback streams (`Stream/Output/Audio`), so it never took effect.
+It is no longer shipped. Rewriting it as a `stream.rules` entry would be
+worse than useless: the EQ's own output, `speakereq2x2.output`, is a
+`Stream/Output/Audio` too, and would be pointed back into the EQ.
+
 ### Filter Types
 
 Each EQ band supports these filter types (controlled by `type` parameter):
